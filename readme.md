@@ -21,7 +21,7 @@ pip install pandas numpy matplotlib seaborn scikit-learn
 ### **2. rodando**
 Coloque as planilhas junto ao arquivo em py e rode o projeto
 
-
+---
 ## **Passo a Passo do Experimento**
 
 ### **1. Carregamento e Visualização dos Dados**
