@@ -1,6 +1,4 @@
-# Como rodar essa prr
-
-Qualquer um consegue
+# Como rodar 
 
 ## 1. Baixar as planilhas
 
