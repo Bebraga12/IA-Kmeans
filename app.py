@@ -38,9 +38,11 @@ features_scaled = scaler.fit_transform(features)
 pca = PCA(n_components=0.95)
 features_pca = pca.fit_transform(features_scaled)
 
-# Quantos componentes foram selecionados?
+# Resumo do PCA
+print("Resumo do PCA:")
 print(f"Componentes principais selecionados: {pca.n_components_}")
 print(f"Variância explicada por componente: {pca.explained_variance_ratio_}")
+print(f"Variância total explicada: {sum(pca.explained_variance_ratio_):.2f}")
 
 # 4. Determinar o número ideal de clusters
 # Método do cotovelo e coeficiente de silhueta
@@ -51,52 +53,26 @@ range_clusters = range(2, 11)
 for k in range_clusters:
     kmeans = KMeans(n_clusters=k, random_state=0)
     y_kmeans = kmeans.fit_predict(features_pca)
-    distortions.append(kmeans.inertia_)  # Soma das distâncias ao quadrado
+    distortions.append(kmeans.inertia_)
     silhouettes.append(silhouette_score(features_pca, y_kmeans))
 
-# Plotar o método do cotovelo
-plt.figure(figsize=(8, 4))
-plt.plot(range_clusters, distortions, marker='o')
-plt.title('Método do Cotovelo')
-plt.xlabel('Número de clusters')
-plt.ylabel('Distortion')
-plt.grid()
-plt.show()
-
-# Plotar o coeficiente de silhueta
-plt.figure(figsize=(8, 4))
-plt.plot(range_clusters, silhouettes, marker='o')
-plt.title('Coeficiente de Silhueta')
-plt.xlabel('Número de clusters')
-plt.ylabel('Silhouette Score')
-plt.grid()
-plt.show()
+# Determinar o número de clusters com o maior coeficiente de silhueta
+optimal_clusters = range_clusters[np.argmax(silhouettes)]
+print("\nNúmero ideal de clusters:")
+print(f"Baseado no coeficiente de silhueta, o número ideal de clusters é {optimal_clusters}.")
 
 # 5. Aplicar K-Means com o número ideal de clusters
-# Baseado nos gráficos anteriores, escolha o número ideal de clusters (exemplo: 4)
-n_clusters = 4
-kmeans = KMeans(n_clusters=n_clusters, random_state=0)
+kmeans = KMeans(n_clusters=optimal_clusters, random_state=0)
 y_kmeans = kmeans.fit_predict(features_pca)
 
 # Adicionar os rótulos ao dataset original
 data['Cluster'] = y_kmeans
 
 # 6. Analisar os clusters
-# Estatísticas descritivas por cluster
 cluster_profiles = data.groupby('Cluster').mean()
-print("Perfis de clusters:")
+print("\nPerfis dos Clusters:")
 print(cluster_profiles)
 
-# 7. Visualização (se possível, em 2D ou 3D usando PCA)
-plt.figure(figsize=(8, 6))
-sample_data = features_pca[:1000]  # Exemplo com as primeiras 1000 observações
-plt.scatter(sample_data[:, 0], sample_data[:, 1], c=y_kmeans[:1000], cmap='viridis', s=50)
-plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1],
-            s=200, c='red', marker='*', label='Centroids')
-plt.title('Clusters dos Clientes')
-plt.xlabel('Componente Principal 1')
-plt.ylabel('Componente Principal 2')
-plt.legend()
-plt.grid()
-plt.show()
+
+
 
